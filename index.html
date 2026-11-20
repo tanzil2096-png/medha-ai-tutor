@@ -1,0 +1,277 @@
+<div id="medhaTutor" class="medha-app">
+  <header class="topbar">
+    <div class="brand-mark">🧠</div>
+    <div class="brand-copy">
+      <div class="brand-title">MEDHA <span>AI</span></div>
+      <div class="brand-sub">SMART LEARNING PLATFORM</div>
+    </div>
+    <button id="clearChat" class="icon-btn" title="নতুন চ্যাট">＋</button>
+  </header>
+
+  <section class="welcome">
+    <div>
+      <div class="welcome-title">স্বাগতম AI Tutor-এ! 👋</div>
+      <p>প্রশ্ন করো, বুঝে শেখো, নিজের মেধা বাড়াও।</p>
+    </div>
+    <label class="grade-label" for="grade">তোমার শ্রেণি</label>
+    <select id="grade">
+      <option value="শ্রেণি ১">শ্রেণি ১</option><option value="শ্রেণি ২">শ্রেণি ২</option>
+      <option value="শ্রেণি ৩">শ্রেণি ৩</option><option value="শ্রেণি ৪">শ্রেণি ৪</option>
+      <option value="শ্রেণি ৫">শ্রেণি ৫</option><option value="শ্রেণি ৬">শ্রেণি ৬</option>
+      <option value="শ্রেণি ৭">শ্রেণি ৭</option><option value="শ্রেণি ৮">শ্রেণি ৮</option>
+      <option value="শ্রেণি ৯">শ্রেণি ৯</option><option value="শ্রেণি ১০">শ্রেণি ১০</option>
+      <option value="একাদশ">একাদশ</option><option value="দ্বাদশ">দ্বাদশ</option>
+      <option value="বিশ্ববিদ্যালয়">বিশ্ববিদ্যালয়</option>
+    </select>
+    <div class="language-row">
+      <button class="lang active" data-lang="auto">Auto</button>
+      <button class="lang" data-lang="bn">বাংলা</button>
+      <button class="lang" data-lang="en">English</button>
+    </div>
+  </section>
+
+  <div class="section-line"><span>তোমার শেখার সঙ্গী</span><span class="online-dot">● Online</span></div>
+  <main id="chatMessages" class="chat-messages" aria-live="polite">
+    <div class="message bot">
+      <div class="avatar">🧠</div>
+      <div class="bubble">
+        আসসালামু আলাইকুম! আমি MEDHA AI Tutor। 😊<br>
+        তোমার পড়াশোনার যেকোনো প্রশ্ন করো। চাইলে অঙ্ক বা বইয়ের পাতার ছবিও পাঠাতে পারো।
+      </div>
+    </div>
+  </main>
+
+  <div id="imagePreview" class="image-preview hidden">
+    <img id="previewImg" alt="প্রশ্নের ছবি">
+    <button id="removeImage" type="button">✕</button>
+  </div>
+
+  <div class="quick-prompts">
+    <button data-prompt="নিউটনের প্রথম সূত্র সহজভাবে বুঝিয়ে দাও।">📘 বিজ্ঞান</button>
+    <button data-prompt="এই অঙ্কটি ধাপে ধাপে সমাধান করে বুঝিয়ে দাও: ">➗ গণিত</button>
+    <button data-prompt="আমাকে ইংরেজি শেখার ৫টি সহজ টিপস দাও।">🔤 English</button>
+  </div>
+
+  <form id="chatForm" class="composer">
+    <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+    <button id="pickImage" class="tool-btn" type="button" title="ছবি যোগ করো">📷</button>
+    <button id="voiceBtn" class="tool-btn" type="button" title="ভয়েসে প্রশ্ন করো">🎙️</button>
+    <textarea id="question" rows="1" placeholder="এখানে প্রশ্ন লিখো..." required></textarea>
+    <button id="sendBtn" class="send-btn" type="submit">➤</button>
+  </form>
+  <div class="bottom-note">MEDHA AI ভুল করতে পারে—গুরুত্বপূর্ণ তথ্য বইয়ের সঙ্গে মিলিয়ে নিও।</div>
+
+  <section class="history-panel">
+    <div class="history-head"><strong>🕘 আগের প্রশ্ন</strong><button id="clearHistory">History মুছুন</button></div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+#medhaTutor{font-family:'Hind Siliguri',system-ui,sans-serif;max-width:760px;margin:0 auto;background:#0b1424;color:#f4f7ff;min-height:100vh;padding:14px;box-sizing:border-box}
+#medhaTutor *{box-sizing:border-box}
+#medhaTutor .topbar{display:flex;align-items:center;gap:12px;padding:12px 4px 18px;border-bottom:1px solid #263957}
+#medhaTutor .brand-mark{font-size:28px;background:#19365c;border-radius:14px;padding:9px}
+#medhaTutor .brand-title{font-size:23px;font-weight:700;color:#55baf4;letter-spacing:.5px}
+#medhaTutor .brand-title span{color:#fff}
+#medhaTutor .brand-sub{font-size:10px;letter-spacing:1.5px;color:#9fb2cc}
+#medhaTutor .icon-btn{margin-left:auto;border:0;border-radius:50%;width:42px;height:42px;background:#203d66;color:white;font-size:26px}
+#medhaTutor .welcome{margin:16px 0;background:linear-gradient(125deg,#175b8d,#29316c);padding:18px;border-radius:20px}
+#medhaTutor .welcome-title{font-size:22px;font-weight:700}
+#medhaTutor .welcome p{color:#d2e4f8;margin:5px 0 14px}
+#medhaTutor .grade-label{display:block;font-size:13px;color:#dceaff;margin-bottom:5px}
+#medhaTutor select{background:#0e2039;color:#fff;border:1px solid #49648a;padding:10px;border-radius:10px;width:100%;font:inherit}
+#medhaTutor .language-row{display:flex;gap:8px;margin-top:12px}
+#medhaTutor .lang{background:#172b49;border:1px solid #3a5275;color:#c8d8ee;border-radius:20px;padding:6px 15px}
+#medhaTutor .lang.active{background:#239bdc;color:#fff;border-color:#239bdc}
+#medhaTutor .section-line{display:flex;justify-content:space-between;color:#dce8f8;font-weight:600;margin:16px 2px 8px}
+#medhaTutor .online-dot{font-size:12px;color:#65dda0}
+#medhaTutor .chat-messages{height:360px;overflow-y:auto;padding:10px 2px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+#medhaTutor .message{display:flex;gap:8px;align-items:flex-start}
+#medhaTutor .message.user{justify-content:flex-end}
+#medhaTutor .avatar{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#1d3b61}
+#medhaTutor .bubble{max-width:86%;padding:11px 13px;border-radius:15px;background:#182943;color:#e7effc;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+#medhaTutor .user .bubble{background:#176eaa;color:white;border-bottom-right-radius:4px}
+#medhaTutor .bot .bubble{border-bottom-left-radius:4px}
+#medhaTutor .bubble img{max-width:100%;border-radius:9px;display:block;margin-top:8px}
+#medhaTutor .typing{color:#a9c5e4;font-size:13px;padding:4px 40px}
+#medhaTutor .image-preview{position:relative;width:92px;margin:8px 0}
+#medhaTutor .image-preview img{width:92px;height:75px;object-fit:cover;border-radius:10px;border:1px solid #4c729b}
+#medhaTutor .image-preview button{position:absolute;right:-7px;top:-7px;border:0;border-radius:50%;background:#d34c5a;color:white;width:22px;height:22px}
+#medhaTutor .hidden{display:none}
+#medhaTutor .quick-prompts{display:flex;gap:7px;overflow-x:auto;padding:8px 0}
+#medhaTutor .quick-prompts button{white-space:nowrap;border:1px solid #2b4569;border-radius:20px;background:#14243b;color:#cbdcf1;padding:7px 11px;font:inherit;font-size:12px}
+#medhaTutor .composer{display:flex;align-items:flex-end;gap:6px;background:#14243b;border:1px solid #314b70;border-radius:17px;padding:8px}
+#medhaTutor .tool-btn,#medhaTutor .send-btn{border:0;border-radius:12px;min-width:38px;height:40px;background:#203c61;color:white;font-size:18px}
+#medhaTutor textarea{flex:1;min-width:0;resize:none;max-height:110px;border:0;outline:0;background:transparent;color:white;font:inherit;padding:9px 4px}
+#medhaTutor textarea::placeholder{color:#8fa5c1}
+#medhaTutor .send-btn{background:#159ddd;font-size:22px}
+#medhaTutor button{cursor:pointer}
+#medhaTutor button:disabled{opacity:.5;cursor:not-allowed}
+#medhaTutor .bottom-note{text-align:center;color:#8195b0;font-size:10px;margin:9px 0 16px}
+#medhaTutor .history-panel{border-top:1px solid #263957;padding-top:12px}
+#medhaTutor .history-head{display:flex;justify-content:space-between;align-items:center}
+#medhaTutor .history-head button{background:transparent;border:0;color:#82cfff;font:inherit;font-size:12px}
+#medhaTutor .history-list{display:flex;gap:7px;overflow-x:auto;padding:10px 0}
+#medhaTutor .history-item{min-width:150px;max-width:200px;text-align:left;background:#172943;color:#cbdcf1;border:1px solid #2b4263;border-radius:10px;padding:9px;font:inherit;font-size:12px}
+@media(max-width:420px){#medhaTutor{padding:10px}#medhaTutor .chat-messages{height:330px}#medhaTutor .welcome-title{font-size:20px}}
+</style>
+
+<script>
+(() => {
+  // Render deploy করার পর এখানে তোমার Backend URL বসাবে।
+  const API_URL = "https://YOUR-BACKEND-NAME.onrender.com/api/chat";
+  const $ = id => document.getElementById(id);
+  const chat = $("chatMessages");
+  const question = $("question");
+  const imageInput = $("imageInput");
+  let selectedImage = null;
+  let language = "auto";
+  let history = JSON.parse(localStorage.getItem("medhaTutorHistory") || "[]");
+
+  function saveHistory() {
+    localStorage.setItem("medhaTutorHistory", JSON.stringify(history.slice(-60)));
+    renderHistory();
+  }
+  function addMessage(text, who, imageUrl) {
+    const row = document.createElement("div");
+    row.className = "message " + who;
+    if (who === "bot") {
+      const avatar = document.createElement("div");
+      avatar.className = "avatar"; avatar.textContent = "🧠"; row.appendChild(avatar);
+    }
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    if (imageUrl) {
+      const img = document.createElement("img"); img.src = imageUrl; img.alt = "প্রশ্নের ছবি";
+      bubble.appendChild(img);
+    }
+    row.appendChild(bubble); chat.appendChild(row); chat.scrollTop = chat.scrollHeight;
+    return bubble;
+  }
+  function renderHistory() {
+    const list = $("historyList"); list.innerHTML = "";
+    history.slice().reverse().slice(0, 20).forEach(item => {
+      const btn = document.createElement("button"); btn.className = "history-item";
+      btn.textContent = item.question || "ছবির প্রশ্ন";
+      btn.onclick = () => { chat.innerHTML = ""; addMessage("আবার স্বাগতম! আগের প্রশ্নটি: " + (item.question || "ছবির প্রশ্ন"), "bot"); addMessage(item.question || "ছবির প্রশ্ন", "user"); addMessage(item.answer, "bot"); };
+      list.appendChild(btn);
+    });
+  }
+  $("clearHistory").onclick = () => {
+    if (confirm("সব History মুছে ফেলবে?")) { history = []; saveHistory(); }
+  };
+  $("clearChat").onclick = () => {
+    chat.innerHTML = "";
+    addMessage("নতুন চ্যাট শুরু হলো! কী শিখতে চাও?", "bot");
+  };
+
+  document.querySelectorAll("#medhaTutor .lang").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll("#medhaTutor .lang").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active"); language = btn.dataset.lang;
+    };
+  });
+  document.querySelectorAll("#medhaTutor .quick-prompts button").forEach(btn => {
+    btn.onclick = () => { question.value = btn.dataset.prompt; question.focus(); };
+  });
+
+  $("pickImage").onclick = () => imageInput.click();
+  imageInput.onchange = () => {
+    const file = imageInput.files[0];
+    if (!file) return;
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) {
+      alert("JPG, PNG অথবা WEBP ছবি নির্বাচন করো।"); imageInput.value = ""; return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      alert("৪ MB-এর ছোট ছবি নির্বাচন করো।"); imageInput.value = ""; return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      selectedImage = { mimeType: file.type, data: String(reader.result).split(",")[1], preview: reader.result };
+      $("previewImg").src = reader.result; $("imagePreview").classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+  };
+  $("removeImage").onclick = () => {
+    selectedImage = null; imageInput.value = ""; $("imagePreview").classList.add("hidden");
+  };
+
+  $("chatForm").onsubmit = async e => {
+    e.preventDefault();
+    const text = question.value.trim();
+    if (!text && !selectedImage) return;
+    if (API_URL.includes("YOUR-BACKEND-NAME")) {
+      alert("প্রথমে JavaScript-এর API_URL-এ তোমার Backend URL বসাও।"); return;
+    }
+    const sentImage = selectedImage;
+    addMessage(text || "ছবিটি সমাধান করো।", "user", sentImage?.preview);
+    question.value = ""; selectedImage = null; imageInput.value = ""; $("imagePreview").classList.add("hidden");
+    const typing = document.createElement("div"); typing.className = "typing"; typing.textContent = "MEDHA AI উত্তর তৈরি করছে…"; chat.appendChild(typing); chat.scrollTop = chat.scrollHeight;
+    $("sendBtn").disabled = true;
+
+    try {
+      const recent = history.slice(-10).flatMap(item => [
+        { role: "user", text: item.question || "ছবির প্রশ্ন" },
+        { role: "model", text: item.answer }
+      ]);
+      const payload = {
+        message: text,
+        grade: $("grade").value,
+        language,
+        history: recent,
+        image: sentImage ? { mimeType: sentImage.mimeType, data: sentImage.data } : null
+      };
+      const response = await fetch(API_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "অনুরোধটি সম্পন্ন হয়নি।");
+      typing.remove();
+      addMessage(data.answer, "bot");
+      history.push({ question: text || "ছবির প্রশ্ন", answer: data.answer, time: Date.now() });
+      saveHistory();
+    } catch (err) {
+      typing.remove();
+      addMessage("দুঃখিত, সমস্যা হয়েছে: " + err.message, "bot");
+    } finally { $("sendBtn").disabled = false; question.focus(); }
+  };
+
+  // Speech-to-text: device/browser support থাকলে কাজ করবে।
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  $("voiceBtn").onclick = () => {
+    if (!SpeechRecognition) {
+      alert("এই WebView-তে ভয়েস ইনপুট সমর্থিত নয়। Chrome ব্রাউজারে চেষ্টা করো অথবা Android native speech recognition যোগ করতে হবে।");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = language === "en" ? "en-US" : "bn-BD";
+    recognition.interimResults = false;
+    recognition.onresult = event => {
+      question.value = (question.value + " " + event.results[0][0].transcript).trim();
+      question.focus();
+    };
+    recognition.onerror = () => alert("মাইক্রোফোন কাজ করেনি। Permission পরীক্ষা করো।");
+    recognition.start();
+  };
+
+  // Text-to-speech: ডিভাইসে বাংলা voice থাকলে সেটি ব্যবহার করবে।
+  window.medhaSpeak = text => {
+    if (!("speechSynthesis" in window)) { alert("এই ডিভাইসে Text-to-Speech নেই।"); return; }
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language === "en" ? "en-US" : "bn-BD";
+    speechSynthesis.speak(utterance);
+  };
+  // AI উত্তরের বুদবুদে ট্যাপ করলে উত্তর শোনাবে।
+  chat.addEventListener("click", e => {
+    const bubble = e.target.closest(".bot .bubble");
+    if (bubble && bubble.textContent) window.medhaSpeak(bubble.textContent);
+  });
+
+  renderHistory();
+})();
+</script>
