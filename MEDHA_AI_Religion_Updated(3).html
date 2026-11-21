@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101d35">
+<title>MEDHA AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0b1220;color:#fff;padding-bottom:75px}
+header{background:#142440;padding:14px 16px;position:sticky;top:0;z-index:5;border-bottom:1px solid #293c5a}
+.brand{font-size:22px;font-weight:700;color:#70caff}
+.brand small{display:block;font-size:10px;color:#a9bdd7;letter-spacing:1px}
+main{max-width:650px;margin:auto;padding:16px}
+h2,h3{margin-bottom:8px}
+.card{background:#17263d;border:1px solid #2b3c56;border-radius:14px;padding:15px;margin-bottom:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sub{text-align:center;cursor:pointer;margin:0;padding:18px 8px;font-weight:700}
+.sub span{display:block;font-size:26px;margin-bottom:6px}
+button{border:0;background:#249ee7;color:#fff;padding:12px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer}
+.full{width:100%;display:block;margin-top:10px}
+.opt{width:100%;text-align:left;background:#203550;margin-top:8px;border:2px solid transparent}
+.ok{border-color:#39d99a}.bad{border-color:#ff7777}
+.ghost{background:#24466d}
+input,select,textarea{width:100%;padding:11px;margin-top:5px;border-radius:9px;border:1px solid #33496a;background:#0f1a2d;color:#fff;font-size:15px}
+textarea{min-height:70px}
+label{display:block;margin-top:11px;font-size:13px;color:#a9bdd7}
+.m{color:#aabbd1;font-size:13px;line-height:1.5}
+.hero{padding:20px;border-radius:16px;background:linear-gradient(130deg,#15558a,#292b65);margin-bottom:14px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#142440;border-top:1px solid #293c5a}
+nav button{flex:1;background:none;border-radius:0;padding:14px 4px;color:#a9bdd7}
+details{margin-top:8px}summary{cursor:pointer;color:#70caff}
+.ans{margin-top:8px;color:#d4e6fa;line-height:1.6;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header><div class="brand">MEDHA AI<small>স্মার্ট স্টাডি অ্যাপ</small></div></header>
+<main id="app"></main>
+<nav id="nav" style="display:none">
+<button onclick="home()">🏠 হোম</button>
+<button onclick="adm()">➕ প্রশ্ন যোগ</button>
+<button onclick="prof()">👤 প্রোফাইল</button>
+</nav>
+<script>
+/* ===== অ্যাপের ভেতরে বসানো প্রশ্ন (সবার ফোনে দেখাবে) =====
+   নতুন প্রশ্ন এখানে এই ফরম্যাটে যোগ করো:
+   {cls:"Class 6",subject:"গণিত",type:"mcq",chapter:"",question:"",answer:"",options:["","","",""],correct:"A"}
+   type = mcq / cq / sq   (cq ও sq তে options ও correct লাগবে না) */
+const BASE=[
+{cls:"Class 6",subject:"গণিত",type:"mcq",chapter:"যোগ",question:"৫ + ৭ = কত?",answer:"৫ + ৭ = ১২",options:["১০","১১","১২","১৩"],correct:"C"},
+{cls:"Class 6",subject:"বিজ্ঞান",type:"cq",chapter:"উদ্ভিদ",question:"উদ্ভিদ কীভাবে খাদ্য তৈরি করে? ব্যাখ্যা করো।",answer:"উদ্ভিদ সূর্যের আলো, পানি ও কার্বন ডাই-অক্সাইড ব্যবহার করে সালোকসংশ্লেষণের মাধ্যমে খাদ্য তৈরি করে।"},
+{cls:"Class 6",subject:"বাংলাদেশ ও বিশ্বপরিচয়",type:"sq",chapter:"",question:"বাংলাদেশের রাজধানীর নাম কী?",answer:"ঢাকা"}
+];
+
+const KEY="medha_questions_v1",UK="medha_user";
+const CL=["Class 6","Class 7","Class 8","Class 9","Class 10","Class 11","Class 12"];
+const GR={Science:"বিজ্ঞান",Commerce:"ব্যবসায় শিক্ষা",Arts:"মানবিক"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const set=h=>{$("app").innerHTML=h;scrollTo(0,0)};
+let DB=[],U=null,S="",SL=[],Q=[],qi=0,sc=0,ans=false,ctx={};
+try{DB=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(DB))DB=[]}catch(e){DB=[]}
+try{U=JSON.parse(localStorage.getItem(UK)||"null")}catch(e){U=null}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(DB));
+const ALL=()=>BASE.concat(DB);
+const typ=q=>q.type||(q.correct?"mcq":"cq");
+const num=c=>+c.split(" ")[1];
+
+function subs(cls,g){
+ const n=num(cls);
+ if(n<=8)return["বাংলা ১ম পত্র","বাংলা ২য় পত্র","English 1st Paper","English 2nd Paper","বিজ্ঞান","গণিত","ICT","বাংলাদেশ ও বিশ্বপরিচয়","ধর্ম"];
+ const c=["বাংলা ১ম পত্র","বাংলা ২য় পত্র","English 1st Paper","English 2nd Paper","ICT"];
+ if(n<=10)c.push("গণিত","বাংলাদেশ ও বিশ্বপরিচয়");
+ const x={
+  Science:["পদার্থবিজ্ঞান","রসায়ন","জীববিজ্ঞান","উচ্চতর গণিত"],
+  Commerce:n<=10?["হিসাববিজ্ঞান","ব্যবসায় উদ্যোগ","ফিন্যান্স ও ব্যাংকিং"]:["হিসাববিজ্ঞান","ব্যবসায় সংগঠন ও ব্যবস্থাপনা","ফিন্যান্স, ব্যাংকিং ও বিমা","উৎপাদন ব্যবস্থাপনা ও বিপণন"],
+  Arts:n<=10?["ভূগোল ও পরিবেশ","ইতিহাস ও বিশ্বসভ্যতা","পৌরনীতি ও নাগরিকতা","অর্থনীতি"]:["ইতিহাস","অর্থনীতি","পৌরনীতি ও সুশাসন","যুক্তিবিদ্যা"]
+ };
+ return c.concat(x[g]||[]);
+}
+const allSubs=c=>{
+ let r=[];["Science","Commerce","Arts"].forEach(g=>subs(c,g).forEach(s=>{if(!r.includes(s))r.push(s)}));
+ if(num(c)>=11){
+  const split=["পদার্থবিজ্ঞান","রসায়ন","জীববিজ্ঞান","উচ্চতর গণিত"];
+  r=r.filter(s=>!split.includes(s));
+  split.forEach(s=>r.push(s+" ১ম পত্র",s+" ২য় পত্র"));
+ }
+ return r;
+};
+const hasTwoPapers=()=>num(U.cls)>=11&&U.group==="Science";
+function chooseSub(i){
+ const subject=SL[i];
+ const split=["পদার্থবিজ্ঞান","রসায়ন","জীববিজ্ঞান","উচ্চতর গণিত"];
+ if(hasTwoPapers()&&split.includes(subject)){
+  set(`<button class="ghost" onclick="home()">← পিছনে</button>
+  <h2 style="margin:12px 0">${esc(subject)}</h2>
+  <p class="m" style="margin-bottom:12px">পত্র নির্বাচন করো</p>
+  <div class="card"><button class="full" onclick="selectPaper('${subject}','১ম পত্র')">${esc(subject)} ১ম পত্র</button>
+  <button class="full" onclick="selectPaper('${subject}','২য় পত্র')">${esc(subject)} ২য় পত্র</button></div>`);
+  return;
+ }
+ S=subject;sp();
+}
+function selectPaper(subject,paper){S=subject+" "+paper;sp();}
+
+/* ---------- অ্যাকাউন্ট ---------- */
+function start(){
+ $("nav").style.display=U?"flex":"none";
+ U?home():auth();
+}
+function auth(){
+ set(`<div class="hero"><h2>স্বাগতম! 👋</h2><p class="m">অ্যাকাউন্ট খুলে পড়াশোনা শুরু করো</p></div>
+ <div class="card">
+ <label>তোমার নাম</label><input id="n" placeholder="নাম লেখো">
+ <label>মোবাইল নম্বর</label><input id="p" type="tel" maxlength="11" placeholder="01XXXXXXXXX">
+ <label>কোন ক্লাসে পড়ো?</label>
+ <select id="c" onchange="gt()">${CL.map(x=>`<option>${x}</option>`).join("")}</select>
+ <div id="gw" style="display:none"><label>গ্রুপ</label>
+ <select id="g">${Object.keys(GR).map(k=>`<option value="${k}">${GR[k]}</option>`).join("")}</select></div>
+ <button class="full" onclick="reg()">অ্যাকাউন্ট খোলো</button></div>`);
+}
+function gt(){$("gw").style.display=num($("c").value)>=9?"block":"none"}
+function reg(){
+ const n=$("n").value.trim(),p=$("p").value.trim(),c=$("c").value;
+ if(!n){alert("নাম লিখতে হবে!");return}
+ if(!/^01\d{9}$/.test(p)){alert("সঠিক ১১ ডিজিটের মোবাইল নম্বর দাও!");return}
+ U={name:n,phone:p,cls:c,group:num(c)>=9?$("g").value:""};
+ localStorage.setItem(UK,JSON.stringify(U));
+ start();
+}
+function prof(){
+ set(`<div class="card"><h3>👤 ${esc(U.name)}</h3>
+ <p class="m">মোবাইল: ${esc(U.phone)}<br>ক্লাস: ${esc(U.cls)}${U.group?"<br>গ্রুপ: "+GR[U.group]:""}</p>
+ <button class="full ghost" onclick="out()">লগ আউট / নতুন অ্যাকাউন্ট</button></div>`);
+}
+function out(){if(confirm("লগ আউট করবে?")){localStorage.removeItem(UK);U=null;start()}}
+
+/* ---------- হোম ও বিষয় ---------- */
+function home(){
+ SL=subs(U.cls,U.group);
+ set(`<div class="hero"><h2>হ্যালো, ${esc(U.name)} 👋</h2><p class="m">${esc(U.cls)}${U.group?" • "+GR[U.group]:""} — বিষয় বেছে নাও</p></div>
+ <div class="grid">${SL.map((s,i)=>`<div class="card sub" onclick="chooseSub(${i})"><span>📘</span>${esc(s)}</div>`).join("")}</div>`);
+}
+function religion(name){S=name;sp()}
+const cnt=t=>ALL().filter(q=>q.cls==U.cls&&q.subject==S&&typ(q)==t).length;
+function sp(i){
+ if(i!=null)S=SL[i];
+ set(`<button class="ghost" onclick="home()">← পিছনে</button>
+ <h2 style="margin-top:12px">${esc(S)}</h2>
+ <div class="card"><h3>📝 MCQ</h3><p class="m">${cnt("mcq")} টি প্রশ্ন</p><button class="full" onclick="pr('mcq')">MCQ প্র্যাকটিস</button></div>
+ <div class="card"><h3>✍️ CQ (সৃজনশীল)</h3><p class="m">${cnt("cq")} টি প্রশ্ন</p><button class="full" onclick="pr('cq')">CQ প্র্যাকটিস</button></div>
+ <div class="card"><h3>💬 SQ (সংক্ষিপ্ত প্রশ্ন)</h3><p class="m">${cnt("sq")} টি প্রশ্ন</p><button class="full" onclick="pr('sq')">SQ প্র্যাকটিস</button></div>
+ <div class="card"><h3>⏱️ টেস্ট (MCQ)</h3><p class="m">কতটি প্রশ্নের টেস্ট দিতে চাও?</p>
+ <div class="grid" style="grid-template-columns:1fr 1fr 1fr"><button onclick="ts(10)">১০</button><button onclick="ts(20)">২০</button><button onclick="ts(30)">৩০</button></div></div>`);
+}
+const list=t=>ALL().filter(q=>q.cls==U.cls&&q.subject==S&&typ(q)==t);
+const none=()=>set(`<button class="ghost" onclick="sp()">← পিছনে</button><div class="card" style="margin-top:12px"><p class="m">এই অংশে এখনো কোনো প্রশ্ন নেই।</p></div>`);
+
+/* ---------- প্র্যাকটিস ---------- */
+function pr(t){
+ const l=list(t);
+ if(!l.length)return none();
+ if(t=="mcq")return run(l,"MCQ প্র্যাকটিস");
+ set(`<button class="ghost" onclick="sp()">← পিছনে</button><h3 style="margin:12px 0">${t.toUpperCase()} প্র্যাকটিস</h3>
+ ${l.map(q=>`<div class="card"><p class="m">${esc(q.chapter)}</p><h4>${esc(q.question)}</h4>
+ <details><summary>উত্তর দেখো</summary><div class="ans">${esc(q.answer)}</div></details></div>`).join("")}`);
+}
+function ts(n){
+ const l=list("mcq").sort(()=>Math.random()-.5);
+ if(!l.length)return none();
+ if(l.length<n)alert("এই বিষয়ে মাত্র "+l.length+" টি MCQ আছে, তাই "+l.length+" টির টেস্ট হবে।");
+ run(l.slice(0,n),"টেস্ট");
+}
+function run(l,title){Q=l;qi=0;sc=0;ctx.t=title;ask()}
+function ask(){
+ const q=Q[qi];ans=false;
+ set(`<p class="m">${ctx.t} • ${qi+1} / ${Q.length}</p><h3 style="margin:12px 0">${esc(q.question)}</h3>
+ ${q.options.map((o,i)=>o?`<button class="opt" onclick="pk(${i},this)">${"ABCD"[i]}. ${esc(o)}</button>`:"").join("")}
+ <div id="fb"></div>`);
+}
+function pk(i,b){
+ if(ans)return;ans=true;
+ const q=Q[qi],bs=document.querySelectorAll(".opt");
+ bs.forEach(x=>x.disabled=true);
+ const lt="ABCD"[i];
+ b.classList.add(lt==q.correct?"ok":"bad");
+ if(lt==q.correct)sc++;else bs.forEach(x=>{if(x.textContent.startsWith(q.correct+".")) x.classList.add("ok")});
+ $("fb").innerHTML=(q.answer?`<div class="card ans" style="margin-top:12px">${esc(q.answer)}</div>`:"")+
+ `<button class="full" onclick="nx()">${qi==Q.length-1?"ফলাফল দেখো":"পরের প্রশ্ন →"}</button>`;
+}
+function nx(){
+ qi++;
+ if(qi<Q.length)return ask();
+ set(`<div class="card" style="text-align:center"><h2>শেষ! 🎉</h2><h1 style="margin:10px 0">${sc} / ${Q.length}</h1>
+ <p class="m">তোমার ফলাফল</p>
+ <button class="full" onclick="run(Q.slice().sort(()=>Math.random()-.5),ctx.t)">আবার চেষ্টা করো</button>
+ <button class="full ghost" onclick="sp()">বিষয়ে ফিরে যাও</button></div>`);
+}
+
+/* ---------- প্রশ্ন যোগ (শুধু এই ফোনে সেভ হয়) ---------- */
+function adm(){
+ const c=ctx.ac||U.cls;ctx.ac=c;
+ set(`<div class="card"><h3>➕ নতুন প্রশ্ন</h3>
+ <label>ক্লাস</label><select id="ac" onchange="ctx.ac=this.value;adm()">${CL.map(x=>`<option ${x==c?"selected":""}>${x}</option>`).join("")}</select>
+ <label>বিষয়</label><select id="as">${allSubs(c).map(x=>`<option>${esc(x)}</option>`).join("")}</select>
+ <label>ধরন</label><select id="at" onchange="tg()"><option value="mcq">MCQ</option><option value="cq">CQ</option><option value="sq">SQ</option></select>
+ <label>অধ্যায়</label><input id="ach">
+ <label>প্রশ্ন</label><textarea id="aq"></textarea>
+ <label>উত্তর / ব্যাখ্যা</label><textarea id="aa"></textarea>
+ <div id="ao"><label>অপশন</label>
+ <input id="o0" placeholder="A"><input id="o1" placeholder="B" style="margin-top:6px"><input id="o2" placeholder="C" style="margin-top:6px"><input id="o3" placeholder="D" style="margin-top:6px">
+ <label>সঠিক উত্তর</label><select id="ok"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+ <button class="full" onclick="sv()">সেভ করো</button></div>
+ <h3 style="margin:16px 0 8px">${esc(c)} এর যোগ করা প্রশ্ন</h3>
+ ${DB.filter(q=>q.cls==c).map(q=>`<div class="card"><p class="m">${typ(q).toUpperCase()} • ${esc(q.subject)}</p><p>${esc(q.question)}</p>
+ <button class="ghost" style="margin-top:8px" onclick="dl('${q.id}')">🗑 মুছো</button></div>`).join("")||'<p class="m">এখনো কিছু যোগ করোনি।</p>'}`);
+}
+function tg(){$("ao").style.display=$("at").value=="mcq"?"block":"none"}
+function sv(){
+ const t=$("at").value,q={id:String(Date.now()),cls:$("ac").value,subject:$("as").value,type:t,chapter:$("ach").value.trim(),
+ question:$("aq").value.trim(),answer:$("aa").value.trim(),options:[0,1,2,3].map(i=>$("o"+i).value.trim()),correct:""};
+ if(!q.question){alert("প্রশ্ন লিখতে হবে!");return}
+ if(t=="mcq"){
+  q.correct=$("ok").value;
+  if(q.options.filter(Boolean).length<2||!q.options["ABCD".indexOf(q.correct)]){alert("কমপক্ষে ২টি অপশন আর সঠিক অপশনটি পূরণ করো!");return}
+ }else{q.options=["","","",""];if(!q.answer){alert("উত্তর লিখতে হবে!");return}}
+ DB.push(q);save();alert("সেভ হয়েছে ✅");adm();
+}
+function dl(id){if(confirm("মুছে ফেলবে?")){DB=DB.filter(q=>q.id!=id);save();adm()}}
+
+start();
+</script>
+</body>
+</html>
